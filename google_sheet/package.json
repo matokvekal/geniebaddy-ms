@@ -1,0 +1,27 @@
+{
+  "name": "gf-microservices",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart:dev": "pm2 stop google_sheet 2> /dev/null || true",
+    "start:dev": "MODE=development pm2 start ./server.js --name=google_sheet",
+    "prestart:preprod": "pm2 stop google_sheet 2> /dev/null || true",
+    "start:preprod": "MODE=preprod pm2 start ./server.js --name=google_sheet",
+    "prestart:prod": "pm2 stop google_sheet 2> /dev/null || true",
+    "start:prod": "MODE=production pm2 start ./server.js --name=google_sheet"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "google": "^2.1.0",
+    "google-auth-library": "^7.11.0",
+    "googleapis": "^92.0.0",
+    "mysql2": "^2.3.2",
+    "sequelize": "^6.11.0"
+  }
+}

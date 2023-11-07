@@ -1,0 +1,46 @@
+{
+	"name": "green-fleet",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@react-google-maps/api": "^2.4.1",
+		"@testing-library/jest-dom": "^5.14.1",
+		"@testing-library/react": "^11.2.7",
+		"@testing-library/user-event": "^12.8.3",
+		"bootstrap": "5.1.1",
+		"fs": "0.0.1-security",
+		"i18next": "^21.2.6",
+		"i18next-browser-languagedetector": "^6.1.2",
+		"i18next-xhr-backend": "^3.2.2",
+		"mobx": "^6.3.3",
+		"moment": "^2.29.4",
+		"mysql": "^2.18.1",
+		"mysql2": "^2.3.3",
+		"node-cron": "^3.0.2",
+		"sequelize": "^6.33.0",
+		"typescript": "^4.7.4",
+		"web-vitals": "^1.1.2"
+	},
+	"scripts": {
+		"install-services": "npm install --prefix update_resource_trip_from_planning && npm install --prefix update_location_info_ituran && npm install --prefix get_yit_and_split && npm install --prefix control  && npm install --prefix alerts_for_trip && npm install --prefix mobile_notifications && npm install --prefix update_legs && npm install --prefix update_stations &&  npm install --prefix create_routes_from_drivers && npm install --prefix sms_sender && npm install --prefix alerts && npm install --prefix  handle_alerts_and_overlapping && npm install --prefix  yit_get_data && npm install --prefix orders_status_check && npm install --prefix debriefing && npm install --prefix update_toll_roads && npm install --prefix netivim",
+		"start:dev": "npm run --prefix update_resource_trip_from_planning start:dev && npm run --prefix update_location_info_ituran start:dev && npm run --prefix get_yit_and_split start:dev && npm run --prefix control start:dev && npm run --prefix alerts_for_trip start:dev && npm run --prefix mobile_notifications start:dev &&  npm run --prefix update_stations start:dev && npm run --prefix update_legs start:dev && npm run --prefix create_routes_from_drivers start:dev && npm run --prefix sms_sender start:dev && npm run --prefix alerts start:dev && npm run --prefix handle_alerts_and_overlapping start:dev && npm run --prefix yit_get_data start:dev && npm run --prefix orders_status_check start:dev && npm run --prefix debriefing start:dev && npm run --prefix update_toll_roads start:dev && npm run --prefix netivim start:dev",
+		"start:preprod": "npm run --prefix update_resource_trip_from_planning start:preprod && npm run --prefix update_location_info_ituran start:preprod && npm run --prefix get_yit_and_split start:preprod && npm run --prefix control start:preprod && npm run --prefix alerts_for_trip start:preprod && npm run --prefix mobile_notifications start:preprod && npm run --prefix update_legs start:preprod && npm run --prefix update_stations start:preprod &&  npm run --prefix create_routes_from_drivers start:preprod && npm run --prefix sms_sender start:preprod && npm run --prefix alerts start:preprod && npm run --prefix handle_alerts_and_overlapping start:preprod && npm run --prefix yit_get_data start:preprod && npm run --prefix orders_status_check start:preprod && npm run --prefix debriefing start:preprod && npm run --prefix update_toll_roads start:preprod && npm run --prefix netivim start:preprod",
+		"start:prod": "npm run --prefix update_resource_trip_from_planning start:prod && npm run --prefix update_location_info_ituran start:prod && npm run --prefix get_yit_and_split start:prod && npm run --prefix control start:prod && npm run --prefix alerts_for_trip start:prod  && npm run --prefix mobile_notifications start:prod && npm run --prefix update_legs start:prod && npm run --prefix update_stations start:prod &&  npm run --prefix create_routes_from_drivers start:prod && npm run --prefix sms_sender start:prod && npm run --prefix alerts start:prod && npm run --prefix handle_alerts_and_overlapping start:prod && npm run --prefix yit_get_data start:prod && npm run --prefix orders_status_check start:prod && npm run --prefix debriefing start:prod && npm run --prefix update_toll_roads start:prod && npm run --prefix netivim start:prod"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"eslint-config-prettier": "^8.5.0",
+		"jasmine": "^5.1.0"
+	}
+}
