@@ -37,9 +37,10 @@ sequelize
 	.catch((error) => {
 		console.error('Unable to connect to the database:', error);
 	});
-const transaction = await sequelize.transaction();
+
 // SQL query function
 async function run() {
+	const transaction = await sequelize.transaction();
 	try {
 		console.log('Starting SQL execution...');
 		const SQL = `UPDATE genie_posts SET post_status='new',
@@ -101,18 +102,18 @@ async function run() {
 }
 
 // Stored procedure example
-async function runStoredProc(company_id) {
-	try {
-		console.log('Starting stored procedure execution...');
-		await sequelize.query(
-			`CALL \`${dbConfig.NAME}\`.remove_resource_duplicate('${company_id}');`,
-		);
+// async function runStoredProc(company_id) {
+// 	try {
+// 		console.log('Starting stored procedure execution...');
+// 		await sequelize.query(
+// 			`CALL \`${dbConfig.NAME}\`.remove_resource_duplicate('${company_id}');`,
+// 		);
 
-		console.log('Stored procedure execution completed.', utcString);
-	} catch (error) {
-		console.error('Error executing stored procedure:', error);
-	}
-}
+// 		console.log('Stored procedure execution completed.', utcString);
+// 	} catch (error) {
+// 		console.error('Error executing stored procedure:', error);
+// 	}
+// }
 
 run();
 
