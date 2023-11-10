@@ -10,7 +10,7 @@
     "prestart:preprod": "pm2 stop update_toll_roads 2> /dev/null || true",
     "start:preprod": "MODE=preprod pm2 start ./server.js --name=update_toll_roads",
     "prestart:prod": "pm2 stop update_toll_roads 2> /dev/null || true",
-    "start:prod": "MODE=production pm2 start ./server.js --name=update_toll_roads"
+    "start:prod": "MODE=production pm2 start ./server.js --node-args=\"-r esm\" --name=microservice"
   },
   "type": "module",
   "keywords": [],
