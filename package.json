@@ -6,16 +6,23 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run start:local",
+    "start:local": "onchange \"gb/**/*\" -i -k -- node ./gb/server.js",
     "prestart:prod": "pm2 stop microservices 2> /dev/null || true",
-    "start:prod": "pm2 start ./gb/server.js --node-args=\"-r esm\" --name=microservices"
+    "start:prod": "pm2 start ./gb/server.js --name=microservices"
   },
   "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "moment": "^2.29.1",
+    "mysql2": "^3.6.3",
     "node-cron": "^3.0.0",
     "sequelize": "^6.11.0"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25",
+    "onchange": "^7.1.0"
   }
 }
