@@ -72,27 +72,27 @@ async function run() {
     const SQL2 = `
 		UPDATE genie_users SET
     user_posts_count = CASE
-      WHEN DATE(user_posts_count_date) < DATE('${yesterdayUTC}') THEN 0
+      WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN 0
       ELSE user_posts_count
     END,
     user_posts_count_date = CASE
-      WHEN DATE(user_posts_count_date) < DATE('${yesterdayUTC}') THEN NULL
+      WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN NULL
       ELSE user_posts_count_date
     END,
     genie_watching_ids = CASE
-      WHEN DATE(genie_watching_id_date) < DATE('${yesterdayUTC}') THEN NULL
+      WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
       ELSE genie_watching_ids
     END,
     genie_watching_id_date = CASE
-      WHEN DATE(genie_watching_id_date) < DATE('${yesterdayUTC}') THEN NULL
+      WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
       ELSE genie_watching_id_date
     END,
     genie_answer_count = CASE
-      WHEN DATE(genie_answer_count_date) < DATE('${yesterdayUTC}') THEN 0
+      WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
       ELSE genie_answer_count
     END,
     genie_answer_count_date = CASE
-      WHEN DATE(genie_answer_count_date) < DATE('${yesterdayUTC}') THEN NULL
+      WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
       ELSE genie_answer_count_date
     END,
     last_updated = UTC_TIMESTAMP()
