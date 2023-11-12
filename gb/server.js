@@ -1,17 +1,30 @@
 import cron from 'node-cron';
 import Sequelize from 'sequelize';
 import { configByEnv } from './config.js';
-//node ./gb/server.js
 const mode = process.env.MODE || 'development';
 const dbConfig = configByEnv[mode].database;
 import moment from 'moment';
-// Setting up the database connection
+
+export const postStatus = {
+	OPEN: `open`,
+	CLOSED: `closed`,
+	DELETED: `deleted`,
+	NEW: `new`,
+	HOLD: `hold`,
+};
+
+export const serverConstants = {
+	MAX_MESSAGE_GENIE_WATCH_PER_DAY: 10,
+	MAX_MESSAGE_GENIE_ANSWER_PER_DAY: 10,
+};
+
 const sequelize = new Sequelize(
-	dbConfig.NAME,
-	dbConfig.USER,
-	dbConfig.PASSWORD,
+	dbConfig.DB_NAME,
+	dbConfig.USER||process.env.MY_SQL_USER,
+	dbConfig.PASSWORD|| process.env.MY_SQL_PASSWORD,
 	{
-		host: dbConfig.HOST,
+		host: dbConfig.MY_SQL_HOST||process.env.MY_SQL_HOST,
+		port: dbConfig.PORT,
 		dialect: dbConfig.dialect,
 		dialectOptions: {
 			multipleStatements: true,

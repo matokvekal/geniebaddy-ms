@@ -1,46 +1,21 @@
 {
-	"name": "green-fleet",
-	"version": "0.1.0",
-	"private": true,
-	"dependencies": {
-		"@react-google-maps/api": "^2.4.1",
-		"@testing-library/jest-dom": "^5.14.1",
-		"@testing-library/react": "^11.2.7",
-		"@testing-library/user-event": "^12.8.3",
-		"bootstrap": "5.1.1",
-		"fs": "0.0.1-security",
-		"i18next": "^21.2.6",
-		"i18next-browser-languagedetector": "^6.1.2",
-		"i18next-xhr-backend": "^3.2.2",
-		"mobx": "^6.3.3",
-		"moment": "^2.29.4",
-		"mysql": "^2.18.1",
-		"mysql2": "^2.3.3",
-		"node-cron": "^3.0.2",
-		"sequelize": "^6.33.0",
-		"typescript": "^4.7.4",
-		"web-vitals": "^1.1.2"
-	},
-	"scripts": {
-		"start:dev": "MODE=development pm2 start ./gb/server.js --name=gb-update-db",
-		"install-services": "npm install --prefix update_resource_trip_from_planning ",
-		"start:preprod": "npm run --prefix update_resource_trip_from_planning start:preprod ",
-		"start:prod": "npm run --prefix update_resource_trip_from_planning start:prod "
-	},
-	"browserslist": {
-		"production": [
-			">0.2%",
-			"not dead",
-			"not op_mini all"
-		],
-		"development": [
-			"last 1 chrome version",
-			"last 1 firefox version",
-			"last 1 safari version"
-		]
-	},
-	"devDependencies": {
-		"eslint-config-prettier": "^8.5.0",
-		"jasmine": "^5.1.0"
-	}
+  "name": "microservices",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run start:local",
+    "prestart:prod": "pm2 stop microservices 2> /dev/null || true",
+    "start:prod": "pm2 start ./gb/server.js --node-args=\"-r esm\" --name=microservices"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.29.1",
+    "node-cron": "^3.0.0",
+    "sequelize": "^6.11.0"
+  }
 }
