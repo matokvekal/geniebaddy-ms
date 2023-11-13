@@ -53,60 +53,76 @@ sequelize
 
 // SQL query function
 async function run() {
-  const transaction = await sequelize.transaction();
   try {
-    console.log("Starting SQL execution...");
-    const SQL = `UPDATE genie_posts SET post_status='new',
+    const checkSQL = `
+      SELECT COUNT(*) as count 
+      FROM genie_posts 
+      WHERE post_status = 'hold' 
+        AND status_time < UTC_TIMESTAMP() - INTERVAL 10 MINUTE 
+        AND is_block = 0 
+        AND is_active = 1`;
+
+    const [results, metadata] = await sequelize.query(checkSQL, {
+      transaction,
+    });
+    const count = results[0].count;
+    if (count > 0) {
+      console.log(`Found ${count} records to update.`);
+
+      const transaction = await sequelize.transaction();
+      console.log("Starting SQL execution...");
+      const SQL = `UPDATE genie_posts SET post_status='new',
 						status_time=UTC_TIMESTAMP(),
 						genie_id=0  
 						WHERE post_status="hold" 
 						AND status_time <UTC_TIMESTAMP() - INTERVAL 10 MINUTE 
 						and is_block=0 and is_active=1`;
-    console.log("SQL:", SQL);
-    await sequelize.query(SQL, { transaction: transaction });
-    const yesterdayUTC = moment
-      .utc()
-      .subtract(1, "day")
-      .format("YYYY-MM-DD HH:mm:ss");
+      console.log("SQL:", SQL);
+      await sequelize.query(SQL, { transaction: transaction });
+      const yesterdayUTC = moment
+        .utc()
+        .subtract(1, "day")
+        .format("YYYY-MM-DD HH:mm:ss");
 
-    const SQL2 = `
-		UPDATE genie_users SET
-    user_posts_count = CASE
-      WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN 0
-      ELSE user_posts_count
-    END,
-    user_posts_count_date = CASE
-      WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE user_posts_count_date
-    END,
-    genie_watching_ids = CASE
-      WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE genie_watching_ids
-    END,
-    genie_watching_id_date = CASE
-      WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE genie_watching_id_date
-    END,
-    genie_answer_count = CASE
-      WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
-      ELSE genie_answer_count
-    END,
-    genie_answer_count_date = CASE
-      WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE genie_answer_count_date
-    END,
-    last_updated = UTC_TIMESTAMP()
-  WHERE
-    user_role = 'user'
-    AND is_active = 1
-    AND is_register = 1
+      const SQL2 = `
+					UPDATE genie_users SET
+				user_posts_count = CASE
+					WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN 0
+					ELSE user_posts_count
+				END,
+				user_posts_count_date = CASE
+					WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN NULL
+					ELSE user_posts_count_date
+				END,
+				genie_watching_ids = CASE
+					WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
+					ELSE genie_watching_ids
+				END,
+				genie_watching_id_date = CASE
+					WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
+					ELSE genie_watching_id_date
+				END,
+				genie_answer_count = CASE
+					WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
+					ELSE genie_answer_count
+				END,
+				genie_answer_count_date = CASE
+					WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
+					ELSE genie_answer_count_date
+				END,
+				last_updated = UTC_TIMESTAMP()
+			   WHERE
+				user_role = 'user'
+				AND is_active = 1
+				AND is_register = 1
     `;
 
-    console.log("SQL2:", SQL2);
-    await sequelize.query(SQL2, { transaction: transaction });
-    await transaction.commit();
+      console.log("SQL2:", SQL2);
+      await sequelize.query(SQL2, { transaction: transaction });
+      await transaction.commit();
 
-    const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
+      const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
+    }
     console.log("SQL execution completed.", utcString);
   } catch (error) {
     await transaction.rollback();
