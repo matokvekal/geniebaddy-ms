@@ -51,39 +51,40 @@ sequelize
     console.error("Unable to connect to the database:", error);
   });
 
-// SQL query function
+// when genie watch new post we change them to post_status=hold, but after 10 minutes we  change them back to post_status=new so other users can watch them
 async function run() {
+	console.log("Runing SQL execution...", moment.utc().format("DD-MM-YYYY HH:mm:ss"));
+  const transaction = await sequelize.transaction();
   try {
     const checkSQL = `
       SELECT COUNT(*) as count 
       FROM genie_posts 
       WHERE post_status = 'hold' 
         AND status_time < UTC_TIMESTAMP() - INTERVAL 10 MINUTE 
-        AND is_block = 0 
         AND is_active = 1`;
 
     const [results, metadata] = await sequelize.query(checkSQL, {
       transaction,
     });
     const count = results[0].count;
+
     if (count > 0) {
       console.log(`Found ${count} records to update.`);
 
-      const transaction = await sequelize.transaction();
       console.log("Starting SQL execution...");
       const SQL = `UPDATE genie_posts SET post_status='new',
 						status_time=UTC_TIMESTAMP(),
 						genie_id=0  
 						WHERE post_status="hold" 
 						AND status_time <UTC_TIMESTAMP() - INTERVAL 10 MINUTE 
-						and is_block=0 and is_active=1`;
-      console.log("SQL:", SQL);
+					and is_active=1`;
+      // console.log("SQL:", SQL);
       await sequelize.query(SQL, { transaction: transaction });
       const yesterdayUTC = moment
         .utc()
         .subtract(1, "day")
         .format("YYYY-MM-DD HH:mm:ss");
-
+//here we update the post acount for user after 24 houres
       const SQL2 = `
 					UPDATE genie_users SET
 				user_posts_count = CASE
@@ -122,29 +123,17 @@ async function run() {
       await transaction.commit();
 
       const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
+		console.log("SQL execution completed.", utcString);
+    }else {
+      console.log("No records to update. Rolling back transaction.");
+      await transaction.rollback();
     }
-    console.log("SQL execution completed.", utcString);
+
   } catch (error) {
     await transaction.rollback();
     console.error("Error executing SQL:", error);
   }
 }
-
-// Stored procedure example
-// async function runStoredProc(company_id) {
-// 	try {
-// 		console.log('Starting stored procedure execution...');
-// 		await sequelize.query(
-// 			`CALL \`${dbConfig.NAME}\`.remove_resource_duplicate('${company_id}');`,
-// 		);
-
-// 		console.log('Stored procedure execution completed.', utcString);
-// 	} catch (error) {
-// 		console.error('Error executing stored procedure:', error);
-// 	}
-// }
-
-run();
 
 // Custom cron format
 const executeMinutesParam = 1; // Run every 1 minute
@@ -153,8 +142,8 @@ const cronExecuteFormat = `*/${executeMinutesParam} * * * *`; // EVERY X MINUTES
 // Cron job based on the custom format
 cron.schedule(cronExecuteFormat, async function () {
   try {
-    run();
+   await  run();
   } catch (e) {
-    console.log(`e`, e);
+	console.error("Error occurred in cron job:", e);
   }
 });
