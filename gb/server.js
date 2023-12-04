@@ -51,7 +51,7 @@ sequelize
     console.error("Unable to connect to the database:", error);
   });
 
-async function updateHoldToNew(transaction) {
+async function updateHoldToNew() {
   const checkSQL = `
   SELECT COUNT(*) as count 
   FROM genie_posts 
@@ -59,9 +59,7 @@ async function updateHoldToNew(transaction) {
     AND status_time < UTC_TIMESTAMP() - INTERVAL 10 MINUTE 
     AND is_active = 1`;
 
-  const [results, metadata] = await sequelize.query(checkSQL, {
-    transaction,
-  });
+  const [results, metadata] = await sequelize.query(checkSQL);
   const count = results[0].count;
 
   if (count > 0) {
@@ -75,10 +73,9 @@ async function updateHoldToNew(transaction) {
         AND status_time <UTC_TIMESTAMP() - INTERVAL 10 MINUTE 
       and is_active=1`;
     // console.log("SQL:", SQL);
-    await sequelize.query(SQL, { transaction: transaction });
+    await sequelize.query(SQL);
   } else {
-    console.log("No records to update. Rolling back transaction.");
-    await transaction.rollback();
+    console.log("No records to update.");
   }
 }
 
@@ -97,42 +94,41 @@ async function checkPostCount() {
     user_posts_count_date = CASE
       WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN NULL
       ELSE user_posts_count_date
-    END,D,
+    END,
     last_updated = UTC_TIMESTAMP()
      WHERE
     user_role = 'user'
     AND is_active = 1
-    AND is_register = 1
-`;
+    AND is_register = 1`;
 
-  console.log("SQL2:",SQL2);
-  // console.log("SQL2:", SQL2);
   await sequelize.query(SQL2);
 
-  const SQL3= `
-UPDATE genie_users SET
-genie_watching_ids = CASE
-  WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
-  ELSE genie_watching_ids
-END,
-genie_watching_id_date = CASE
-  WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
-  ELSE genie_watching_id_date
-END,
-genie_answer_count = CASE
-  WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
-  ELSE genie_answer_count
-END,
-genie_answer_count_date = CASE
-  WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
-  ELSE genie_answer_count_date
-END,
-last_updated = UTC_TIMESTAMP()
- WHERE
-user_role = 'genie'
-AND is_active = 1
-AND is_register = 1
-`;
+  const SQL3 = `
+  UPDATE genie_users SET
+  genie_watching_ids = CASE
+    WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
+    ELSE genie_watching_ids
+  END,
+  genie_watching_id_date = CASE
+    WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
+    ELSE genie_watching_id_date
+  END,
+  genie_answer_count = CASE
+    WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
+    ELSE genie_answer_count
+  END,
+  genie_answer_count_date = CASE
+    WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
+    ELSE genie_answer_count_date
+  END,
+  last_updated = UTC_TIMESTAMP()
+  WHERE
+  user_role = 'genie'
+  AND is_active = 1
+  AND is_register = 1
+  `;
+  // console.log("SQL3:", SQL3);
+  await sequelize.query(SQL3);
   const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
   console.log("SQL execution completed.", utcString);
 }
@@ -142,14 +138,10 @@ async function run() {
     "Runing SQL execution...",
     moment.utc().format("DD-MM-YYYY HH:mm:ss")
   );
-  const transaction = await sequelize.transaction();
   try {
-    await updateHoldToNew(transaction);
+    await updateHoldToNew();
     await checkPostCount();
   } catch (error) {
-    if (transaction) {
-      await transaction.rollback();
-    }
     console.error("Error executing SQL:", error);
   }
 }
