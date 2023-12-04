@@ -89,7 +89,7 @@ async function checkPostCount() {
     .format("YYYY-MM-DD HH:mm:ss");
   //here we update the post acount for user after 24 houres
   const SQL2 = `
-      UPDATE genie_users SET
+    UPDATE genie_users SET
     user_posts_count = CASE
       WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN 0
       ELSE user_posts_count
@@ -97,23 +97,7 @@ async function checkPostCount() {
     user_posts_count_date = CASE
       WHEN DATE(user_posts_count_date) <= DATE('${yesterdayUTC}') THEN NULL
       ELSE user_posts_count_date
-    END,
-    genie_watching_ids = CASE
-      WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE genie_watching_ids
-    END,
-    genie_watching_id_date = CASE
-      WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE genie_watching_id_date
-    END,
-    genie_answer_count = CASE
-      WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
-      ELSE genie_answer_count
-    END,
-    genie_answer_count_date = CASE
-      WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
-      ELSE genie_answer_count_date
-    END,
+    END,D,
     last_updated = UTC_TIMESTAMP()
      WHERE
     user_role = 'user'
@@ -121,10 +105,34 @@ async function checkPostCount() {
     AND is_register = 1
 `;
 
-  console.log("SQL2:");
+  console.log("SQL2:",SQL2);
   // console.log("SQL2:", SQL2);
   await sequelize.query(SQL2);
 
+  const SQL3= `
+UPDATE genie_users SET
+genie_watching_ids = CASE
+  WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
+  ELSE genie_watching_ids
+END,
+genie_watching_id_date = CASE
+  WHEN DATE(genie_watching_id_date) <= DATE('${yesterdayUTC}') THEN NULL
+  ELSE genie_watching_id_date
+END,
+genie_answer_count = CASE
+  WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN 0
+  ELSE genie_answer_count
+END,
+genie_answer_count_date = CASE
+  WHEN DATE(genie_answer_count_date) <= DATE('${yesterdayUTC}') THEN NULL
+  ELSE genie_answer_count_date
+END,
+last_updated = UTC_TIMESTAMP()
+ WHERE
+user_role = 'genie'
+AND is_active = 1
+AND is_register = 1
+`;
   const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
   console.log("SQL execution completed.", utcString);
 }
