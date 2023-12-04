@@ -127,7 +127,6 @@ async function checkPostCount() {
   AND is_active = 1
   AND is_register = 1
   `;
-  // console.log("SQL3:", SQL3);
   await sequelize.query(SQL3);
   const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
   console.log("SQL execution completed.", utcString);
