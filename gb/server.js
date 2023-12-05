@@ -131,6 +131,55 @@ async function checkPostCount() {
   const utcString = moment.utc().format("DD-MM-YYYY HH:mm:ss");
   console.log("SQL execution completed.", utcString);
 }
+async function updateTopicCounts() {
+  try {
+    // Initialize counts for all topics to 0
+    const allTopicsResult = await sequelize.query(
+      `SELECT id FROM genie_topics`,
+      { type: Sequelize.QueryTypes.SELECT }
+    );
+
+    let topicCounts = {};
+    allTopicsResult.forEach(topic => {
+      topicCounts[topic.id] = 0;
+    });
+
+    // Fetch preferred_topics for genies active in the last 2 months
+    const queryResult = await sequelize.query(
+      `SELECT preferred_topics
+       FROM genie_users
+       WHERE user_role = 'genie' 
+         AND is_active = 1 
+         AND last_active > NOW() - INTERVAL 2 MONTH`,
+      { type: Sequelize.QueryTypes.SELECT }
+    );
+
+    // Process the result to update counts
+    queryResult.forEach((row) => {
+      row.preferred_topics.split(",").forEach((topicId) => {
+        if (topicId in topicCounts) {
+          topicCounts[topicId] += 1;
+        }
+      });
+    });
+
+    // Update genie_topics with the new counts
+    for (const [topicId, count] of Object.entries(topicCounts)) {
+      await sequelize.query(
+        `UPDATE genie_topics
+         SET active_genies = :count
+         WHERE id = :topicId`,
+        {
+          replacements: { count: count, topicId: topicId },
+          type: Sequelize.QueryTypes.UPDATE,
+        }
+      );
+    }
+  } catch (error) {
+    console.error("Error in updateTopicCounts:", error);
+  }
+}
+
 // when genie watch new post we change them to post_status=hold, but after 10 minutes we  change them back to post_status=new so other users can watch them
 async function run() {
   console.log(
@@ -146,9 +195,10 @@ async function run() {
 }
 
 // Custom cron format
-const executeMinutesParam = 1; // Run every 1 minute
+const executeMinutesParam = 10; // Run every 1 minute
 const cronExecuteFormat = `*/${executeMinutesParam} * * * *`; // EVERY X MINUTES
 
+updateTopicCounts();
 // Cron job based on the custom format
 cron.schedule(cronExecuteFormat, async function () {
   try {
@@ -156,4 +206,10 @@ cron.schedule(cronExecuteFormat, async function () {
   } catch (e) {
     console.error("Error occurred in cron job:", e);
   }
+});
+
+//Cron job to run updateTopicCounts every 3 hours
+cron.schedule("0 */3 * * *", async function () {
+  console.log("Running updateTopicCounts every 3 hours");
+  await updateTopicCounts();
 });

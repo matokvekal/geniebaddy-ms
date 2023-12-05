@@ -21,7 +21,7 @@ const baseConfig = {
       acquire: 30000,
       idle: 10000,
     },
-  },
+  }, 
 };
 
 const configByEnv = {

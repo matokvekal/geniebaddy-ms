@@ -61,16 +61,5 @@ describe("Server Tests", () => {
         expect(isError).toBe(false);
     });
 
-   //  it("should execute stored procedure without errors", async () => {
-   //      let isError = false;
-   //      const company_id = 'sample_company_id'; // Replace with a valid company_id for testing
-   //      try {
-   //          await sequelize.query(
-   //              `CALL \`${dbConfig.NAME}\`.remove_resource_duplicate('${company_id}');`
-   //          );
-   //      } catch (error) {
-   //          isError = true;
-   //      }
-   //      expect(isError).toBe(false);
-   //  });
+
 });
