@@ -52,6 +52,7 @@ sequelize
   });
 
 async function updateHoldToNew() {
+  console.log("Running updateHoldToNew");
   const checkSQL = `
   SELECT COUNT(*) as count 
   FROM genie_posts 
@@ -80,6 +81,7 @@ async function updateHoldToNew() {
 }
 
 async function checkPostCount() {
+  console.log("Running checkPostCount");
   const yesterdayUTC = moment
     .utc()
     .subtract(1, "day")
@@ -133,6 +135,7 @@ async function checkPostCount() {
 }
 async function updateTopicCounts() {
   try {
+    console.log("Running updateTopicCounts");
     // Initialize counts for all topics to 0
     const allTopicsResult = await sequelize.query(
       `SELECT id FROM genie_topics`,
