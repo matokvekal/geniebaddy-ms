@@ -197,6 +197,7 @@ async function run() {
   }
 }
 
+console.log("starting ms-genie-cron",moment.utc().format("DD-MM-YYYY HH:mm:ss"));
 // Custom cron format
 const executeMinutesParam = 10; // Run every 1 minute
 const cronExecuteFormat = `*/${executeMinutesParam} * * * *`; // EVERY X MINUTES
