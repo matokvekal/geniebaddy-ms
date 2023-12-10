@@ -8,7 +8,7 @@
     "start:local": "onchange \"gb/**/*\" -i -k -- node ./gb/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart:dev": "pm2 stop server-dev 2> /dev/null || true",
-    "start:dev": " pm2 start ./app/index.js --node-args=\"-r esm\" --name=server-dev"
+    "start:dev": "pm2 start ./app/index.js --name=server-dev"
   },
   "type": "module",
   "keywords": [],
@@ -22,7 +22,6 @@
     "sequelize": "^6.11.0"
   },
   "devDependencies": {
-    "esm": "^3.2.25",
     "onchange": "^7.1.0"
   }
 }
