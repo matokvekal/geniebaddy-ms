@@ -2,13 +2,13 @@
   "name": "microservices",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "ms/gb/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run start:local",
-    "start:local": "onchange \"gb/**/*\" -i -k -- node ./gb/server.js",
-    "prestart:prod": "pm2 stop microservices 2> /dev/null || true",
-    "start:prod": "pm2 start ./gb/server.js --name=microservices"
+    "start:local": "onchange \"gb/**/*\" -i -k -- node ./gb/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart:dev": "pm2 stop server-dev 2> /dev/null || true",
+    "start:dev": " pm2 start ./app/index.js --node-args=\"-r esm\" --name=server-dev"
   },
   "type": "module",
   "keywords": [],
