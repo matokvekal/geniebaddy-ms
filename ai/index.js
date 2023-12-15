@@ -1,22 +1,14 @@
 import cron from "node-cron";
 import Sequelize from "sequelize";
-import configByEnv from "./config.jsOLD";
+import configByEnv from "../config.js";
 const mode = process.env.MODE || "development";
 const dbConfig = configByEnv.database;
 import moment from "moment";
+import OpenAI from "openai";
+const openai = new OpenAI();
+openai_api_key=configByEnv.openai_api_key
 
-export const postStatus = {
-  OPEN: `open`,
-  CLOSED: `closed`,
-  DELETED: `deleted`,
-  NEW: `new`,
-  HOLD: `hold`,
-};
 
-export const serverConstants = {
-  MAX_MESSAGE_GENIE_WATCH_PER_DAY: 10,
-  MAX_MESSAGE_GENIE_ANSWER_PER_DAY: 10,
-};
 
 const sequelize = new Sequelize(
   dbConfig.DB_NAME,
@@ -183,6 +175,43 @@ async function updateTopicCounts() {
   }
 }
 
+openai.api_key=openai_api_key;
+
+
+async function ai() {
+  const completion = await openai.chat.completions.create({
+    messages:[
+      {"role": "system", "content": "You are a helpful assistant."},
+      {"role": "user", "content": "Who won the world series in 2020?"},
+      {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+      {"role": "user", "content": "Where was it played?"}
+    ],
+    model: "gpt-3.5-turbo",
+  });
+  console.log(completion.choices[0]);
+  return completion.choices[0]
+
+}
+
+async function getrowFromDb(){//not rady at all
+  const SQL = `SELECT * FROM genie_posts WHERE post_status='AI_USER' LIMIT 1`;
+  const [results, metadata] = await sequelize.query(SQL);
+  return results[0]
+}
+
+async function processPostAtAi(){//not rady at all
+  const row=await getrowFromDb()
+  // const completion = await openai.chat.completions.create({
+  return data;
+}
+
+async function updatePostToDb(){//not rady at all
+  const SQL = `UPDATE genie_posts SET post_status='AI_USER' WHERE id=${row.id}`;
+  const [results, metadata] = await sequelize.query(SQL);
+  return results[0]
+}
+
+
 // when genie watch new post we change them to post_status=hold, but after 10 minutes we  change them back to post_status=new so other users can watch them
 async function run() {
   console.log(
@@ -190,30 +219,69 @@ async function run() {
     moment.utc().format("DD-MM-YYYY HH:mm:ss")
   );
   try {
-    await updateHoldToNew();
-    await checkPostCount();
+    await ai();
+    // await updateHoldToNew();
+    // await checkPostCount();
   } catch (error) {
     console.error("Error executing SQL:", error);
   }
 }
 
 console.log("starting ms-genie-cron",moment.utc().format("DD-MM-YYYY HH:mm:ss"));
-// Custom cron format
 const executeMinutesParam = 1; // Run every 1 minute
-const cronExecuteFormat = `*/${executeMinutesParam} * * * *`; // EVERY X MINUTES
 
-updateTopicCounts();
-// Cron job based on the custom format
-cron.schedule(cronExecuteFormat, async function () {
+async function runAndUpdate() {
   try {
-    await run();
+    while (true) {
+      const shouldRun = await run();
+      if (!shouldRun) {
+        console.log("Sleeping for 1 minute...");
+        await new Promise((resolve) => setTimeout(resolve, 10 * 1000)); // Sleep for 1 minute (60 seconds)
+      }
+    }
   } catch (e) {
-    console.error("Error occurred in cron job:", e);
+    console.error("Error occurred:", e);
   }
-});
+}
 
-//Cron job to run updateTopicCounts every 3 hours
-cron.schedule("0 */3 * * *", async function () {
-  console.log("Running updateTopicCounts every 3 hours");
-  await updateTopicCounts();
-});
+// Start the loop
+runAndUpdate();
+
+/////////////////////
+/////server
+//server new postcheck config array ['user_1','user_2','user_3','genie_1','genie_2','genie_3']
+// if array.lenth===0 do nothing
+//else if current user/genie is not in array continu
+//else if current user/genie is in array then update post status to AI_USER / or AI_GENIE
+//update the post to post_ai
+//update all the rest as well, but in the user_X or genie_X update "post is checking"
+
+
+/////service
+//this service check if post_status=AI_USER or AI_GENIE, if so 
+//get the post
+//2 diferent usecase:1)last_writen_by='user_1' then we also have to ask for metrics, else we just ask for answer
+//send to ai
+//wait for response
+//qw are asking the ai  for:
+//1)is there personal details that can recognize the user/genie (name, phone, email, address, etc)   yess or no be sure 100%
+//2)is there any bad words in the post? קללות אלימות,מיניות טרור השצות ניצול רמאות  yess no 100%
+//3)is teher any asuacide thoth (just from user ) yess no 100%
+//4)fill the metric in the object{sad:0.5,angry:0.3,happy:0.2,etc}
+//5)if no 1 2 3  then update the post to the right palce, clean the post_to_ai, update the metrics, update status to relevant status new/open/closed depand on the turn
+//6)continue to the next post
+
+//client
+//if the post is in ai_status then disable the input
+
+////////simulator//////////////
+//add column AI_boot 
+//run loop that has array of 20 deferent users
+//go to ai  and ask for post as the user_1 
+//create new users and insert data  update ai bot=1
+//create new genie and  raec give the ai and respone  update ai bot=1
+//do so  for all just if  update ai bot=1
+
+//loop every 10 minuts
+// 1 create user  with post from ai 
+//take randome new/open row. read as user or as genie  go to ai and answer

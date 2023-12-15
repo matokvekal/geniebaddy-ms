@@ -19,6 +19,7 @@
     "moment": "^2.29.1",
     "mysql2": "^3.6.3",
     "node-cron": "^3.0.0",
+    "openai": "^4.22.0",
     "sequelize": "^6.11.0"
   },
   "devDependencies": {

@@ -4,9 +4,11 @@ const mode = process.env.NODE_ENV || "development";
 import dotenv from "dotenv"; // Import dotenv using ES6 import
 
 if (process.env.NODE_ENV !== "production") {
+  debugger
   dotenv.config();
 }
 const baseConfig = {
+  openai_api_key:process.env.OPENAI_API_KEY,
   database: {
     MY_SQL_HOST: process.env.MY_SQL_HOST,
     MY_SQL_USER: process.env.MY_SQL_USER,
