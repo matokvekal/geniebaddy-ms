@@ -6,3 +6,7 @@ copy all env
 pm2 start ./gb/index.js --name service
 
 pm2 save
+
+
+
+pm2 start ./ai/index.js --name ai
