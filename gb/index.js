@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import Sequelize from "sequelize";
-import configByEnv from "./config.jsOLD";
+import configByEnv from "./config.js";
 const mode = process.env.MODE || "development";
 const dbConfig = configByEnv.database;
 import moment from "moment";

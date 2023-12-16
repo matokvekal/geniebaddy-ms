@@ -1,12 +1,12 @@
 import cron from "node-cron";
 import Sequelize from "sequelize";
-import configByEnv from "../config.js";
+import configByEnv from "./config.js";
 const mode = process.env.MODE || "development";
 const dbConfig = configByEnv.database;
 import moment from "moment";
 import OpenAI from "openai";
 const openai = new OpenAI();
-openai_api_key=configByEnv.openai_api_key
+const openai_api_key = configByEnv.OPEN_AI_KEY;
 
 
 
@@ -135,7 +135,7 @@ async function updateTopicCounts() {
     );
 
     let topicCounts = {};
-    allTopicsResult.forEach(topic => {
+    allTopicsResult.forEach((topic) => {
       topicCounts[topic.id] = 0;
     });
 
@@ -175,42 +175,43 @@ async function updateTopicCounts() {
   }
 }
 
-openai.api_key=openai_api_key;
-
-
 async function ai() {
   const completion = await openai.chat.completions.create({
-    messages:[
-      {"role": "system", "content": "You are a helpful assistant."},
-      {"role": "user", "content": "Who won the world series in 2020?"},
-      {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
-      {"role": "user", "content": "Where was it played?"}
+    messages: [
+      { role: "system", content: "You are a helpful assistant." },
+      { role: "user", content: "Who won the world series in 2020?" },
+      {
+        role: "assistant",
+        content: "The Los Angeles Dodgers won the World Series in 2020.",
+      },
+      { role: "user", content: "Where was it played?" },
     ],
     model: "gpt-3.5-turbo",
   });
   console.log(completion.choices[0]);
-  return completion.choices[0]
-
+  return completion.choices[0];
 }
 
-async function getrowFromDb(){//not rady at all
+async function getrowFromDb() {
+  //not rady at all
   const SQL = `SELECT * FROM genie_posts WHERE post_status='AI_USER' LIMIT 1`;
   const [results, metadata] = await sequelize.query(SQL);
-  return results[0]
+  return results[0];
 }
 
-async function processPostAtAi(){//not rady at all
-  const row=await getrowFromDb()
+async function processPostAtAi() {
+  //not rady at all
+  const row = await getrowFromDb();
   // const completion = await openai.chat.completions.create({
   return data;
 }
 
-async function updatePostToDb(){//not rady at all
+async function updatePostToDb() {
+  //not rady at all
   const SQL = `UPDATE genie_posts SET post_status='AI_USER' WHERE id=${row.id}`;
   const [results, metadata] = await sequelize.query(SQL);
-  return results[0]
+  return results[0];
 }
-
 
 // when genie watch new post we change them to post_status=hold, but after 10 minutes we  change them back to post_status=new so other users can watch them
 async function run() {
@@ -227,11 +228,15 @@ async function run() {
   }
 }
 
-console.log("starting ms-genie-cron",moment.utc().format("DD-MM-YYYY HH:mm:ss"));
+console.log(
+  "starting ms-genie-cron",
+  moment.utc().format("DD-MM-YYYY HH:mm:ss")
+);
 const executeMinutesParam = 1; // Run every 1 minute
 
 async function runAndUpdate() {
   try {
+    openai.api_key = openai_api_key;
     while (true) {
       const shouldRun = await run();
       if (!shouldRun) {
@@ -256,9 +261,8 @@ runAndUpdate();
 //update the post to post_ai
 //update all the rest as well, but in the user_X or genie_X update "post is checking"
 
-
 /////service
-//this service check if post_status=AI_USER or AI_GENIE, if so 
+//this service check if post_status=AI_USER or AI_GENIE, if so
 //get the post
 //2 diferent usecase:1)last_writen_by='user_1' then we also have to ask for metrics, else we just ask for answer
 //send to ai
@@ -275,13 +279,13 @@ runAndUpdate();
 //if the post is in ai_status then disable the input
 
 ////////simulator//////////////
-//add column AI_boot 
+//add column AI_boot
 //run loop that has array of 20 deferent users
-//go to ai  and ask for post as the user_1 
+//go to ai  and ask for post as the user_1
 //create new users and insert data  update ai bot=1
 //create new genie and  raec give the ai and respone  update ai bot=1
 //do so  for all just if  update ai bot=1
 
 //loop every 10 minuts
-// 1 create user  with post from ai 
+// 1 create user  with post from ai
 //take randome new/open row. read as user or as genie  go to ai and answer
