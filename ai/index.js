@@ -233,15 +233,16 @@ console.log(
   moment.utc().format("DD-MM-YYYY HH:mm:ss")
 );
 const executeMinutesParam = 1; // Run every 1 minute
-
+let counter=0;
 async function runAndUpdate() {
   try {
     openai.api_key = openai_api_key;
     while (true) {
+      run++;
       const shouldRun = await run();
       if (!shouldRun) {
-        console.log("Sleeping for 1 minute...");
-        await new Promise((resolve) => setTimeout(resolve, 10 * 1000)); // Sleep for 1 minute (60 seconds)
+        console.log("Sleeping for 1 minute... run=",run);
+        await new Promise((resolve) => setTimeout(resolve, 60 * 1000)); // Sleep for 1 minute (60 seconds)
       }
     }
   } catch (e) {
