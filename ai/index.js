@@ -238,10 +238,10 @@ async function runAndUpdate() {
   try {
     openai.api_key = openai_api_key;
     while (true) {
-      run++;
+      counter ++;
       const shouldRun = await run();
       if (!shouldRun) {
-        console.log("Sleeping for 1 minute... run=",run);
+        console.log("Sleeping for 1 minute... run=",counter);
         await new Promise((resolve) => setTimeout(resolve, 60 * 1000)); // Sleep for 1 minute (60 seconds)
       }
     }
