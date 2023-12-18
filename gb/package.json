@@ -1,0 +1,23 @@
+{
+  "name": "gb-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "pm2 start index.js --name=gb-service"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "moment": "^2.29.1",
+    "mysql2": "^3.6.3",
+    "node-cron": "^3.0.0",
+    "openai": "^4.22.0",
+    "sequelize": "^6.11.0"
+  },
+  "devDependencies": {}
+}

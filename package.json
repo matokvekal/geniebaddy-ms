@@ -4,8 +4,10 @@
   "description": "",
   "main": "ms/gb/index.js",
   "scripts": {
-    "start": "npm run start:local",
-    "start:local": "onchange \"gb/**/*\" -i -k -- node ./gb/index.js",
+    "start:gb": "pm2 start ./gb/index.js --name=gb-service",
+    "start:ai": "pm2 start ./ai/index.js --name=ai-service",
+    "start:local": "npm run --prefix gb start:dev && npm run --prefix ai start:dev",
+    "install:services": "npm install --prefix gb && npm install --prefix ai",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart:dev": "pm2 stop server-dev 2> /dev/null || true",
     "start:dev": "pm2 start ./app/index.js --name=server-dev"
