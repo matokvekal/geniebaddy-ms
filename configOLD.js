@@ -4,7 +4,6 @@ const mode = process.env.NODE_ENV || "development";
 import dotenv from "dotenv"; // Import dotenv using ES6 import
 import path from "path";
 if (process.env.NODE_ENV !== "production") {
-  debugger
   dotenv.config();
 }
 const baseConfig = {

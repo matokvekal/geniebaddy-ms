@@ -3,8 +3,8 @@ const mode = process.env.NODE_ENV || "development";
 import dotenv from "dotenv"; // Import dotenv using ES6 import
 
 if (process.env.NODE_ENV !== "production") {
-  debugger;
   dotenv.config();
+  // dotenv.config({ path: './ai/.env' });
 }
 const baseConfig = {
   OPEN_AI_KEY: process.env.OPENAI_API_KEY,
@@ -17,7 +17,7 @@ const baseConfig = {
     USER_NAME: process.env.USER_NAME,
     dialect: "mysql",
     pool: {
-      max: 5,
+      max: 10,
       min: 0,
       acquire: 30000,
       idle: 10000,
